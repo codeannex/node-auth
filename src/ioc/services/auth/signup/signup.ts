@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import { User } from '../../../../models/user';
 
-import { BadRequestError } from '@codeannex/error';
+import { BadRequestError, InternalServerError } from '@codeannex/error';
 
 export class Signup {
   private model
@@ -13,6 +13,8 @@ export class Signup {
   }
 
   async create(email: string, password: string, req: Request) {
+    let token = null;
+
     const existingUser = await this.model.findOne({ email });
 
     if (existingUser) {
@@ -23,10 +25,14 @@ export class Signup {
 
     await user.save();
 
-    const token = jwt.sign({
-      id: user.id,
-      email: user.email
-    }, process.env.JWT_KEY!);
+    try {
+      token = jwt.sign({
+        id: user.id,
+        email: user.email
+      }, process.env.JWT_KEY!);
+    } catch(err) {
+      throw new InternalServerError();
+    }
 
     req.session = {
       jwt: token
