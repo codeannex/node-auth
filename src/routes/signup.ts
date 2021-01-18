@@ -1,24 +1,24 @@
 import { Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
+
+import { validate } from '@codeannex/common';
 
 const signup = (express: any, ioc: any) => {
   let router = express.Router();
 
   return router.post(
     '/auth/signup', 
-    body('email').isEmail(),
-    body('password').trim().isLength({ min: 4, max: 20 }),
+    [
+      body('email').isEmail(),
+      body('password').trim().isLength({ min: 4, max: 20 })
+    ],
+    validate,
+    async (req: Request, res: Response) => {
+      const { email, password } = req.body;
 
-    (req: Request, res: Response) => {
-      const errors = validationResult(req);
+      const user = await ioc.Signup.create(email, password, req);
 
-      console.log(errors);
-
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-      res.send(req.body);
+      res.status(201).send(user);
     }
   );
 }; 

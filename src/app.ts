@@ -1,6 +1,9 @@
 import express from 'express';
+import 'express-async-errors';
 import { json } from 'body-parser';
 import cookieSession from 'cookie-session';
+
+import { errorHandler, NotFoundError } from '@codeannex/error';
 
 import ioc from './ioc';
 
@@ -30,5 +33,11 @@ app.use(authenticateRouter);
 app.use(signinRouter);
 app.use(signoutRouter);
 app.use(signupRouter);
+
+app.all('*', async (req, res) => {
+  throw new NotFoundError();
+});
+
+app.use(errorHandler);
 
 export { app };
