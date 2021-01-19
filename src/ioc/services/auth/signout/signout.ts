@@ -1,6 +1,8 @@
+import { Request, Response } from 'express';
+
 export class Signout {
 
-  async create() {
-    console.log('Create User');
+  async signout(req: Request) {
+    req.session = null;
   }
 }

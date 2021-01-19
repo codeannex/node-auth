@@ -1,21 +1,22 @@
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import { Request } from 'express';
 
 import { User } from '../../../../models/user';
 
 import { BadRequestError, InternalServerError } from '@codeannex/error';
 
 export class Signup {
-  private model
+  private _model;
+  private _utils;
 
-  constructor(model: typeof User) {
-    this.model = model;
+  constructor(model: typeof User, utils: any) {
+    this._model = model;
+    this._utils = utils;
   }
 
   async create(email: string, password: string, req: Request) {
     let token = null;
 
-    const existingUser = await this.model.findOne({ email });
+    const existingUser = await this._model.findOne({ email });
 
     if (existingUser) {
       throw new BadRequestError('Email in use');
@@ -26,7 +27,7 @@ export class Signup {
     await user.save();
 
     try {
-      token = jwt.sign({
+      token = this._utils.jwt.sign({
         id: user.id,
         email: user.email
       }, process.env.JWT_KEY!);

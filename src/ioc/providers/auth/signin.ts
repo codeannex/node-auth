@@ -1,8 +1,9 @@
-import { Container } from '../../container';
-import { Signin } from '../../services/auth/signin/signin'; 
+import { Signin } from '../../services/auth/signin/signin';
 
-module.exports = function(container: Container) {
-	container.service('Signin', (container: Container) => {
-		return new Signin();
+import { User } from '../../../models/user';
+
+module.exports = function(container: any) {
+	container.service('Signin', (container: any) => {
+		return new Signin(User, container.Utils);
 	});
 };

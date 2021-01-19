@@ -3,15 +3,17 @@ import { body } from 'express-validator';
 
 import { validate } from '@codeannex/common';
 
+const validationRules = () => [
+  body('email').isEmail(),
+  body('password').trim().isLength({ min: 4, max: 20 })
+];
+
 const signup = (express: any, ioc: any) => {
   let router = express.Router();
 
   return router.post(
     '/auth/signup', 
-    [
-      body('email').isEmail(),
-      body('password').trim().isLength({ min: 4, max: 20 })
-    ],
+    validationRules(),
     validate,
     async (req: Request, res: Response) => {
       const { email, password } = req.body;

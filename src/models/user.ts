@@ -1,6 +1,6 @@
 import { model, Schema, Model, Document } from 'mongoose';
 
-import { Password } from '../services/password';
+import ioc from '../ioc';
 
 interface IUser extends Document {
   email: string;
@@ -25,7 +25,7 @@ const UserSchema: Schema = new Schema({
 
 UserSchema.pre('save', async function(done) {
   if (this.isModified('password')) {
-    const hashed = await Password.toHash(this.get('password'));
+    const hashed = await ioc.Utils.hash(this.get('password'));
 
     this.set('password', hashed);
   }
